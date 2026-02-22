@@ -15,12 +15,11 @@
         .btn-veera:hover { background-color: #00335c; }
         input, select { border: 1px solid #707070; padding: 10px; border-radius: 3px; font-size: 15px; }
         th { text-align: left; background-color: #f1f1f1; padding: 12px; font-size: 13px; text-transform: uppercase; color: #555; letter-spacing: 0.5px; border-bottom: 2px solid #ddd; }
-        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
+        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; line-height: 1.5; }
         .hidden { display: none; }
         .tara-method { border: 1px solid #ddd; padding: 20px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s; }
         .tara-method:hover { border-color: #004277; background: #f0f7ff; }
-        .time-box { line-height: 1.4; }
-        .time-label { font-size: 11px; color: #777; font-weight: bold; text-transform: uppercase; display: block; }
+        .date-bold { font-weight: 700; }
     </style>
 </head>
 <body>
@@ -36,7 +35,7 @@
                 <button onclick="showView('tara')" class="bg-blue-800 text-white px-4 py-1 rounded text-sm font-bold border border-blue-400 uppercase">Logi sisse ametnikuna</button>
             </div>
             <div id="userProfile" class="hidden flex items-center space-x-4">
-                <span class="text-sm border-r pr-4 border-blue-400">JAAN TAMM</span>
+                <span class="text-sm border-r pr-4 border-blue-400 uppercase font-bold">Jaan Tamm</span>
                 <button onclick="logout()" class="text-sm underline">Logi välja</button>
             </div>
         </div>
@@ -44,24 +43,24 @@
 
     <!-- VAADE 1: AVALIK TABEL -->
     <main id="view-home" class="max-w-7xl mx-auto py-10 px-4">
-        <h1 class="text-3xl font-bold mb-8 veera-text">Politseis registreeritud avalikud koosolekud</h1>
+        <h1 class="text-3xl font-bold mb-8 veera-text font-bold">Politseis registreeritud avalikud koosolekud</h1>
         
         <!-- Otsingu sektsioon -->
         <div class="card p-6 mb-8 bg-gray-50 border-t-4 border-t-blue-800">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                 <div>
-                    <label class="block text-sm font-bold mb-1">Alates</label>
+                    <label class="block text-sm font-bold mb-1 uppercase text-gray-600">Alates</label>
                     <input type="text" class="w-full" placeholder="pp.kk.aaaa" value="23.05.2024">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold mb-1">Kuni</label>
+                    <label class="block text-sm font-bold mb-1 uppercase text-gray-600">Kuni</label>
                     <input type="text" class="w-full" placeholder="pp.kk.aaaa">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold mb-1">Märksõna / Koht</label>
+                    <label class="block text-sm font-bold mb-1 uppercase text-gray-600">Märksõna / Koht</label>
                     <input type="text" class="w-full" placeholder="Tallinn, Vabaduse väljak...">
                 </div>
-                <button class="btn-veera w-full h-[46px]">OTSI</button>
+                <button class="btn-veera w-full h-[46px]">Otsi</button>
             </div>
         </div>
 
@@ -70,19 +69,16 @@
             <table class="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th width="180">Aeg</th>
+                        <th width="200">Aeg</th>
                         <th width="35%">Koht / Marsruut</th>
                         <th>Eesmärk / Korraldaja</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Näide 1: Kompleksne asukoht ja marsruut -->
+                    <!-- Näide 1: Sama kuupäev -->
                     <tr>
-                        <td class="time-box">
-                            <span class="time-label">Algus:</span>
-                            <span class="font-bold">24.05.2024</span> 12:00<br>
-                            <span class="time-label mt-2">Lõpp:</span>
-                            <span class="font-bold">24.05.2024</span> 16:00
+                        <td>
+                            <span class="date-bold">24.05.2024</span> 12:00 - 16:00
                         </td>
                         <td>
                             <div class="mb-2"><strong>Koht:</strong> Harju maakond, Tallinn, Kesklinna linnaosa, Vabaduse väljak</div>
@@ -90,39 +86,33 @@
                         </td>
                         <td>
                             <div class="veera-text font-bold uppercase mb-1">Traditsiooniline vanalinna ringkäik ja meeleavaldus</div>
-                            <div class="text-gray-700">MTÜ Tallinna Kultuuripärand</div>
+                            <div class="text-gray-700 font-bold">MTÜ Tallinna Kultuuripärand</div>
                         </td>
                     </tr>
-                    <!-- Näide 2: Mitmepäevane koosolek -->
+                    <!-- Näide 2: Erinevad kuupäevad -->
                     <tr>
-                        <td class="time-box">
-                            <span class="time-label">Algus:</span>
-                            <span class="font-bold">26.05.2024</span> 09:00<br>
-                            <span class="time-label mt-2">Lõpp:</span>
-                            <span class="font-bold">28.05.2024</span> 21:00
+                        <td>
+                            <span class="date-bold">26.05.2024</span> 09:00 - <br><span class="date-bold">28.05.2024</span> 21:00
                         </td>
                         <td>
                             <strong>Koht:</strong> Tartu maakond, Tartu linn, Raekoja plats
                         </td>
                         <td>
                             <div class="veera-text font-bold uppercase mb-1">Kevadine tudengifestival ja vabaõhukoosolekud</div>
-                            <div class="text-gray-700">Tartu Üliõpilaskond</div>
+                            <div class="text-gray-700 font-bold">Tartu Üliõpilaskond</div>
                         </td>
                     </tr>
-                    <!-- Näide 3: Tavaline lühike koosolek -->
+                    <!-- Näide 3: Sama kuupäev (õhtune) -->
                     <tr>
-                        <td class="time-box">
-                            <span class="time-label">Algus:</span>
-                            <span class="font-bold">30.05.2024</span> 17:30<br>
-                            <span class="time-label mt-2">Lõpp:</span>
-                            <span class="font-bold">30.05.2024</span> 19:00
+                        <td>
+                            <span class="date-bold">30.05.2024</span> 17:30 - 19:00
                         </td>
                         <td>
                             <strong>Koht:</strong> Pärnu maakond, Pärnu linn, Iseseisvuse väljak
                         </td>
                         <td>
                             <div class="veera-text font-bold uppercase mb-1">Pikett kohaliku raamatukogu toetuseks</div>
-                            <div class="text-gray-700">Eraisik Mari Mets</div>
+                            <div class="text-gray-700 font-bold">Mari Mets</div>
                         </td>
                     </tr>
                 </tbody>
@@ -150,7 +140,7 @@
                     <div class="font-bold text-blue-700">Smart-ID</div>
                 </div>
             </div>
-            <button onclick="showView('home')" class="text-sm underline text-gray-500 uppercase font-bold tracking-wider">Tühista</button>
+            <button onclick="showView('home')" class="text-sm underline text-gray-500 uppercase font-bold tracking-wider hover:text-blue-800">Tühista</button>
         </div>
     </main>
 
@@ -158,34 +148,34 @@
     <main id="view-form" class="hidden max-w-4xl mx-auto py-10 px-4">
         <div class="mb-6 flex justify-between items-center">
             <button onclick="showView('home')" class="text-sm veera-text font-bold uppercase">← Tagasi avalikule lehele</button>
-            <span class="bg-gray-200 px-3 py-1 rounded text-xs font-bold uppercase">Uus teade</span>
+            <span class="bg-gray-200 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">Uus registreerimine</span>
         </div>
 
         <div class="card p-8 border-t-4 border-t-blue-800">
             <h2 class="text-2xl font-bold mb-6 veera-text border-b pb-4">Avaliku koosoleku teatamine</h2>
             <form id="noticeForm" class="space-y-6">
                 <div>
-                    <label class="block font-bold mb-1">Koosoleku eesmärk</label>
+                    <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Koosoleku eesmärk</label>
                     <textarea id="purpose" rows="3" class="w-full" placeholder="Kirjeldage lühidalt koosoleku sisu ja eesmärki" required></textarea>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block font-bold mb-1">Alguse kuupäev ja kellaaeg</label>
+                        <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Alguse kuupäev ja kellaaeg</label>
                         <input type="datetime-local" id="startDate" class="w-full" required>
                     </div>
                     <div>
-                        <label class="block font-bold mb-1">Toimumise koht (või alguspunkt)</label>
-                        <input type="text" class="w-full" placeholder="Maakond, linn, aadress" required>
+                        <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Toimumise koht / liikumismarsruut</label>
+                        <input type="text" class="w-full" placeholder="Maakond, linn, aadress, tänavad" required>
                     </div>
                 </div>
 
                 <div class="bg-blue-50 p-4 border-l-4 border-blue-800 text-sm">
-                    <strong>KORRALDAJA INFO:</strong> Teie isik on tuvastatud (JAAN TAMM, 38001010000). Kontaktandmed eeltäidetakse rahvastikuregistrist.
+                    <strong>TEAVE:</strong> Teie isik on tuvastatud TARA kaudu (<strong>JAAN TAMM, 38001010000</strong>). Teie andmed lisatakse teatele automaatselt.
                 </div>
 
                 <div class="flex justify-end pt-4 border-t">
-                    <button type="submit" class="btn-veera px-12 py-3">ESITA TEADE</button>
+                    <button type="submit" class="btn-veera px-12 py-3">Esita teade politseile</button>
                 </div>
             </form>
         </div>
@@ -196,7 +186,7 @@
         <div class="card p-12 border-t-4 border-t-green-600">
             <div class="text-green-600 text-6xl mb-6">✓</div>
             <h2 class="text-2xl font-bold mb-4 uppercase">Teade edukalt esitatud!</h2>
-            <p class="mb-8 text-gray-600">Teie teade on registreeritud numbriga <strong>AVK-2024-088</strong>. Politsei vaatab teate läbi ja võtab teadmiseks või küsib täpsustusi 4 tööpäeva jooksul.</p>
+            <p class="mb-8 text-gray-600">Teie teade on registreeritud numbriga <strong>AVK-2024-088</strong>. Politsei vaatab teate läbi ja võtab teadmiseks või võtab teiega ühendust 4 tööpäeva jooksul.</p>
             <button onclick="showView('home')" class="btn-veera">Tagasi avalehele</button>
         </div>
     </main>
@@ -228,9 +218,9 @@
         // Seame vormile vaikimisi miinimumkuupäevaks +4 päeva täna
         const today = new Date();
         today.setDate(today.getDate() + 4);
-        const minDate = today.toISOString().split('T')[0] + "T12:00";
+        const minDateStr = today.toISOString().split('T')[0] + "T12:00";
         const dateInput = document.getElementById('startDate');
-        if(dateInput) dateInput.min = minDate;
+        if(dateInput) dateInput.min = minDateStr;
     </script>
 </body>
 </html>
