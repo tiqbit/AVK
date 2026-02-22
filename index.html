@@ -6,6 +6,11 @@
     <title>Avalikud koosolekud | Politsei- ja Piirivalveamet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- OpenLayers Map CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css">
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js"></script>
+
     <style>
         body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; color: #333; }
         .veera-blue { background-color: #004277; }
@@ -13,44 +18,66 @@
         .card { background: white; border-radius: 2px; border: 1px solid #e1e1e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .btn-veera { background-color: #004277; color: white; padding: 8px 20px; border-radius: 3px; font-weight: bold; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
         .btn-veera:hover { background-color: #00335c; }
+        
+        /* Toggle Switch Stiil */
+        .view-toggle { display: inline-flex; background: #eee; padding: 4px; border-radius: 4px; border: 1px solid #ccc; }
+        .toggle-btn { padding: 6px 16px; font-size: 13px; font-weight: bold; border-radius: 2px; cursor: pointer; transition: 0.2s; color: #555; }
+        .toggle-btn.active { background: #004277; color: white; }
+
         input, select { border: 1px solid #707070; padding: 10px; border-radius: 3px; font-size: 15px; }
-        th { text-align: left; background-color: #f1f1f1; padding: 12px; font-size: 13px; text-transform: uppercase; color: #555; letter-spacing: 0.5px; border-bottom: 2px solid #ddd; }
-        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; line-height: 1.5; }
+        th { text-align: left; background-color: #f1f1f1; padding: 12px; font-size: 13px; text-transform: uppercase; color: #555; border-bottom: 2px solid #ddd; }
+        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
         .hidden { display: none; }
-        .tara-method { border: 1px solid #ddd; padding: 20px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s; }
-        .tara-method:hover { border-color: #004277; background: #f0f7ff; }
         .date-bold { font-weight: 700; }
+
+        /* Kaardi konteiner */
+        #map { width: 100%; height: 600px; border-radius: 2px; }
+        .ol-popup {
+            position: absolute; background-color: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            padding: 15px; border-radius: 4px; border: 1px solid #cccccc; bottom: 12px; left: -50px; min-width: 280px;
+        }
+        .ol-popup:after, .ol-popup:before {
+            top: 100%; border: solid transparent; content: " "; height: 0; width: 0; position: absolute; pointer-events: none;
+        }
+        .ol-popup:after { border-top-color: white; border-width: 10px; left: 48px; margin-left: -10px; }
+        .ol-popup:before { border-top-color: #cccccc; border-width: 11px; left: 48px; margin-left: -11px; }
     </style>
 </head>
 <body>
 
-    <!-- Ülariba -->
     <header class="veera-blue text-white p-4 shadow-md">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-6 cursor-pointer" onclick="showView('home')">
                 <div class="font-bold text-xl tracking-tight uppercase">Politsei- ja Piirivalveamet</div>
             </div>
-            <div id="authButtons" class="flex space-x-4">
-                <button onclick="showView('tara')" class="bg-white text-blue-900 px-4 py-1 rounded text-sm font-bold hover:bg-gray-100 uppercase">Logi sisse korraldajana</button>
+            <div id="authButtons">
+                <button onclick="showView('tara')" class="bg-white text-blue-900 px-4 py-1 rounded text-sm font-bold uppercase mr-2">Logi sisse korraldajana</button>
                 <button onclick="showView('tara')" class="bg-blue-800 text-white px-4 py-1 rounded text-sm font-bold border border-blue-400 uppercase">Logi sisse ametnikuna</button>
             </div>
-            <div id="userProfile" class="hidden flex items-center space-x-4">
-                <span class="text-sm border-r pr-4 border-blue-400 uppercase font-bold">Jaan Tamm</span>
-                <button onclick="logout()" class="text-sm underline">Logi välja</button>
+            <div id="userProfile" class="hidden flex items-center space-x-4 uppercase font-bold text-sm">
+                <span class="border-r pr-4 border-blue-400">Jaan Tamm</span>
+                <button onclick="logout()" class="underline font-normal">Logi välja</button>
             </div>
         </div>
     </header>
 
-    <!-- VAADE 1: AVALIK TABEL -->
     <main id="view-home" class="max-w-7xl mx-auto py-10 px-4">
-        <h1 class="text-3xl font-bold mb-8 veera-text font-bold">Politseis registreeritud avalikud koosolekud</h1>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <h1 class="text-3xl font-bold veera-text">Politseis registreeritud avalikud koosolekud</h1>
+            
+            <!-- Vaate lüliti -->
+            <div class="view-toggle">
+                <div id="btn-tabel" onclick="switchSubView('tabel')" class="toggle-btn active uppercase">Tabelina</div>
+                <div id="btn-kaart" onclick="switchSubView('kaart')" class="toggle-btn uppercase">Kaardil</div>
+            </div>
+        </div>
         
         <!-- Otsingu sektsioon -->
         <div class="card p-6 mb-8 bg-gray-50 border-t-4 border-t-blue-800">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                 <div>
                     <label class="block text-sm font-bold mb-1 uppercase text-gray-600">Alates</label>
-                    <input type="text" class="w-full" placeholder="pp.kk.aaaa" value="23.05.2024">
+                    <input type="text" id="filter-alates" class="w-full" placeholder="pp.kk.aaaa">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-1 uppercase text-gray-600">Kuni</label>
@@ -64,8 +91,8 @@
             </div>
         </div>
 
-        <!-- Tabel -->
-        <div class="card overflow-x-auto">
+        <!-- TABELI VAADE -->
+        <div id="subview-tabel" class="card overflow-x-auto">
             <table class="w-full border-collapse">
                 <thead>
                     <tr>
@@ -74,128 +101,204 @@
                         <th>Eesmärk / Korraldaja</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Näide 1: Sama kuupäev -->
-                    <tr>
-                        <td>
-                            <span class="date-bold">24.05.2024</span> 12:00 - 16:00
-                        </td>
-                        <td>
-                            <div class="mb-2"><strong>Koht:</strong> Harju maakond, Tallinn, Kesklinna linnaosa, Vabaduse väljak</div>
-                            <div class="text-gray-600 text-sm italic"><strong>Marsruut:</strong> Vabaduse väljak – Kaarli puiestee – Toompea tänav – Lossi plats – Pikk jalg – Pikk tänav – Kinga tänav – Raekoja plats – Kullassepa tänav - Harju tänav – Vabaduse väljak</div>
-                        </td>
-                        <td>
-                            <div class="veera-text font-bold uppercase mb-1">Traditsiooniline vanalinna ringkäik ja meeleavaldus</div>
-                            <div class="text-gray-700 font-bold">MTÜ Tallinna Kultuuripärand</div>
-                        </td>
-                    </tr>
-                    <!-- Näide 2: Erinevad kuupäevad -->
-                    <tr>
-                        <td>
-                            <span class="date-bold">26.05.2024</span> 09:00 - <br><span class="date-bold">28.05.2024</span> 21:00
-                        </td>
-                        <td>
-                            <strong>Koht:</strong> Tartu maakond, Tartu linn, Raekoja plats
-                        </td>
-                        <td>
-                            <div class="veera-text font-bold uppercase mb-1">Kevadine tudengifestival ja vabaõhukoosolekud</div>
-                            <div class="text-gray-700 font-bold">Tartu Üliõpilaskond</div>
-                        </td>
-                    </tr>
-                    <!-- Näide 3: Sama kuupäev (õhtune) -->
-                    <tr>
-                        <td>
-                            <span class="date-bold">30.05.2024</span> 17:30 - 19:00
-                        </td>
-                        <td>
-                            <strong>Koht:</strong> Pärnu maakond, Pärnu linn, Iseseisvuse väljak
-                        </td>
-                        <td>
-                            <div class="veera-text font-bold uppercase mb-1">Pikett kohaliku raamatukogu toetuseks</div>
-                            <div class="text-gray-700 font-bold">Mari Mets</div>
-                        </td>
-                    </tr>
+                <tbody id="meeting-table-body">
+                    <!-- Sisu genereeritakse JS-is -->
                 </tbody>
             </table>
-            <div class="p-6 bg-gray-50 text-center text-sm text-gray-500 border-t">
-                Kuvatakse 1-3 registreeritud koosolekut 124-st
+        </div>
+
+        <!-- KAARDI VAADE -->
+        <div id="subview-kaart" class="hidden">
+            <div class="card p-2 relative">
+                <div id="map"></div>
+                <div id="popup" class="ol-popup">
+                    <a href="#" id="popup-closer" class="absolute top-2 right-2 text-gray-400">✖</a>
+                    <div id="popup-content"></div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- VAADE 2: TARA AUTENTIMINE -->
+    <!-- MUUD VAATED (TARA, VORM jne jäävad samaks) -->
     <main id="view-tara" class="hidden max-w-2xl mx-auto py-20 px-4">
         <div class="card p-10 text-center border-t-4 border-t-blue-800">
             <img src="https://e-gov.github.io/TARA-Doku/img/tara-logo.png" alt="TARA" class="h-12 mx-auto mb-8">
-            <h2 class="text-xl font-bold mb-6">Valige autentimisvahend</h2>
-            
+            <h2 class="text-xl font-bold mb-6 uppercase">Valige autentimisvahend</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div onclick="loginSuccess()" class="tara-method">
-                    <div class="font-bold text-blue-700">ID-kaart</div>
-                </div>
-                <div onclick="loginSuccess()" class="tara-method">
-                    <div class="font-bold text-blue-700">Mobiil-ID</div>
-                </div>
-                <div onclick="loginSuccess()" class="tara-method">
-                    <div class="font-bold text-blue-700">Smart-ID</div>
-                </div>
+                <div onclick="loginSuccess()" class="tara-method font-bold text-blue-700">ID-kaart</div>
+                <div onclick="loginSuccess()" class="tara-method font-bold text-blue-700">Mobiil-ID</div>
+                <div onclick="loginSuccess()" class="tara-method font-bold text-blue-700">Smart-ID</div>
             </div>
-            <button onclick="showView('home')" class="text-sm underline text-gray-500 uppercase font-bold tracking-wider hover:text-blue-800">Tühista</button>
+            <button onclick="showView('home')" class="text-sm underline font-bold uppercase text-gray-500">Tühista</button>
         </div>
     </main>
 
-    <!-- VAADE 3: TEATE ESITAMISE VORM -->
     <main id="view-form" class="hidden max-w-4xl mx-auto py-10 px-4">
-        <div class="mb-6 flex justify-between items-center">
-            <button onclick="showView('home')" class="text-sm veera-text font-bold uppercase">← Tagasi avalikule lehele</button>
-            <span class="bg-gray-200 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">Uus registreerimine</span>
-        </div>
-
         <div class="card p-8 border-t-4 border-t-blue-800">
             <h2 class="text-2xl font-bold mb-6 veera-text border-b pb-4">Avaliku koosoleku teatamine</h2>
-            <form id="noticeForm" class="space-y-6">
-                <div>
-                    <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Koosoleku eesmärk</label>
-                    <textarea id="purpose" rows="3" class="w-full" placeholder="Kirjeldage lühidalt koosoleku sisu ja eesmärki" required></textarea>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Alguse kuupäev ja kellaaeg</label>
-                        <input type="datetime-local" id="startDate" class="w-full" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold mb-1 text-sm uppercase text-gray-600">Toimumise koht / liikumismarsruut</label>
-                        <input type="text" class="w-full" placeholder="Maakond, linn, aadress, tänavad" required>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 p-4 border-l-4 border-blue-800 text-sm">
-                    <strong>TEAVE:</strong> Teie isik on tuvastatud TARA kaudu (<strong>JAAN TAMM, 38001010000</strong>). Teie andmed lisatakse teatele automaatselt.
-                </div>
-
-                <div class="flex justify-end pt-4 border-t">
-                    <button type="submit" class="btn-veera px-12 py-3">Esita teade politseile</button>
-                </div>
-            </form>
+            <div class="bg-blue-50 p-4 mb-6 border-l-4 border-blue-800">Olete sisse logitud kui <strong>JAAN TAMM (38001010000)</strong></div>
+            <button onclick="showView('success')" class="btn-veera">Esita teade politseile</button>
         </div>
     </main>
 
-    <!-- VAADE 4: EDUKAS SAATMINE -->
     <main id="view-success" class="hidden max-w-2xl mx-auto py-20 px-4 text-center">
         <div class="card p-12 border-t-4 border-t-green-600">
-            <div class="text-green-600 text-6xl mb-6">✓</div>
             <h2 class="text-2xl font-bold mb-4 uppercase">Teade edukalt esitatud!</h2>
-            <p class="mb-8 text-gray-600">Teie teade on registreeritud numbriga <strong>AVK-2024-088</strong>. Politsei vaatab teate läbi ja võtab teadmiseks või võtab teiega ühendust 4 tööpäeva jooksul.</p>
             <button onclick="showView('home')" class="btn-veera">Tagasi avalehele</button>
         </div>
     </main>
 
     <script>
+        // NÄIDISANDMED (asukohtadega kaardi jaoks)
+        const meetings = [
+            {
+                id: 1,
+                dateStr: "<span class='date-bold'>24.05.2024</span> 12:00 - 16:00",
+                place: "Tallinn, Vabaduse väljak",
+                route: "Vabaduse väljak – Kaarli pst – Toompea – Lossi plats – Pikk jalg – Raekoja plats",
+                title: "Traditsiooniline vanalinna ringkäik",
+                org: "MTÜ Tallinna Kultuuripärand",
+                coords: [24.744, 59.433] // Tallinn
+            },
+            {
+                id: 2,
+                dateStr: "<span class='date-bold'>26.05.2024</span> 09:00 - <br><span class='date-bold'>28.05.2024</span> 21:00",
+                place: "Tartu, Raekoja plats",
+                route: "",
+                title: "Kevadine tudengifestival",
+                org: "Tartu Üliõpilaskond",
+                coords: [26.722, 58.380] // Tartu
+            },
+            {
+                id: 3,
+                dateStr: "<span class='date-bold'>30.05.2024</span> 17:30 - 19:00",
+                place: "Pärnu, Iseseisvuse väljak",
+                route: "",
+                title: "Pikett raamatukogu toetuseks",
+                org: "Eraisik Mari Mets",
+                coords: [24.500, 58.385] // Pärnu
+            }
+        ];
+
+        let map; // OpenLayers kaardi objekt
+
+        function initMap() {
+            if (map) return; // Kui kaart on juba loodud, ära tee uuesti
+
+            const container = document.getElementById('popup');
+            const content = document.getElementById('popup-content');
+            const closer = document.getElementById('popup-closer');
+
+            const overlay = new ol.Overlay({
+                element: container,
+                autoPan: true,
+                autoPanAnimation: { duration: 250 }
+            });
+
+            closer.onclick = function() {
+                overlay.setPosition(undefined);
+                closer.blur();
+                return false;
+            };
+
+            map = new ol.Map({
+                target: 'map',
+                layers: [
+                    new ol.layer.Tile({ source: new ol.source.OSM() })
+                ],
+                overlays: [overlay],
+                view: new ol.View({
+                    center: ol.proj.fromLonLat([25.5, 58.8]), // Eesti keskpunkt
+                    zoom: 7.5
+                })
+            });
+
+            // Lisa markerid
+            const features = meetings.map(m => {
+                const f = new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.fromLonLat(m.coords)),
+                    name: m.title,
+                    desc: m.dateStr + "<br><b>" + m.place + "</b><br>" + m.org
+                });
+                return f;
+            });
+
+            const vectorSource = new ol.source.Vector({ features });
+            const vectorLayer = new ol.layer.Vector({
+                source: vectorSource,
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 8,
+                        fill: new ol.style.Fill({color: '#004277'}),
+                        stroke: new ol.style.Stroke({color: 'white', width: 2})
+                    })
+                })
+            });
+            map.addLayer(vectorLayer);
+
+            // Kliki sündmus kaardil
+            map.on('singleclick', function (evt) {
+                const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
+                if (feature) {
+                    const coordinate = evt.coordinate;
+                    content.innerHTML = '<div class="text-sm">' + feature.get('desc') + '</div>';
+                    overlay.setPosition(coordinate);
+                } else {
+                    overlay.setPosition(undefined);
+                }
+            });
+        }
+
+        function switchSubView(view) {
+            const tabel = document.getElementById('subview-tabel');
+            const kaart = document.getElementById('subview-kaart');
+            const btnTabel = document.getElementById('btn-tabel');
+            const btnKaart = document.getElementById('btn-kaart');
+
+            if (view === 'kaart') {
+                tabel.classList.add('hidden');
+                kaart.classList.remove('hidden');
+                btnKaart.classList.add('active');
+                btnTabel.classList.remove('active');
+                setTimeout(initMap, 100); // Väike viide, et kaart jõuaks renderdada
+            } else {
+                tabel.classList.remove('hidden');
+                kaart.classList.add('hidden');
+                btnTabel.classList.add('active');
+                btnKaart.classList.remove('active');
+            }
+        }
+
         function showView(viewName) {
-            document.querySelectorAll('main').forEach(view => view.classList.add('hidden'));
+            document.querySelectorAll('main').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + viewName).classList.remove('hidden');
-            window.scrollTo(0,0);
+            if (viewName === 'home') switchSubView('tabel');
+        }
+
+        function populateTable() {
+            const body = document.getElementById('meeting-table-body');
+            body.innerHTML = meetings.map(m => `
+                <tr>
+                    <td>${m.dateStr}</td>
+                    <td>
+                        <strong>Koht:</strong> ${m.place}
+                        ${m.route ? `<div class="text-gray-600 text-sm italic mt-1"><strong>Marsruut:</strong> ${m.route}</div>` : ''}
+                    </td>
+                    <td>
+                        <div class="veera-text font-bold uppercase mb-1">${m.title}</div>
+                        <div class="text-gray-700 font-bold">${m.org}</div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Tänane kuupäev Alates väljale
+        function setDefaultDate() {
+            const d = new Date();
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            document.getElementById('filter-alates').value = `${day}.${month}.${year}`;
         }
 
         function loginSuccess() {
@@ -210,17 +313,10 @@
             showView('home');
         }
 
-        document.getElementById('noticeForm').onsubmit = function(e) {
-            e.preventDefault();
-            showView('success');
-        }
-
-        // Seame vormile vaikimisi miinimumkuupäevaks +4 päeva täna
-        const today = new Date();
-        today.setDate(today.getDate() + 4);
-        const minDateStr = today.toISOString().split('T')[0] + "T12:00";
-        const dateInput = document.getElementById('startDate');
-        if(dateInput) dateInput.min = minDateStr;
+        window.onload = () => {
+            populateTable();
+            setDefaultDate();
+        };
     </script>
 </body>
 </html>
