@@ -11,28 +11,29 @@
         .veera-blue { background-color: #004277; }
         .veera-text { color: #004277; }
         .card { background: white; border-radius: 2px; border: 1px solid #e1e1e1; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .btn-veera { background-color: #004277; color: white; padding: 8px 20px; border-radius: 3px; font-weight: bold; transition: 0.2s; }
+        .btn-veera { background-color: #004277; color: white; padding: 8px 20px; border-radius: 3px; font-weight: bold; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
         .btn-veera:hover { background-color: #00335c; }
-        .btn-outline { border: 1px solid #004277; color: #004277; padding: 8px 20px; border-radius: 3px; font-weight: bold; }
-        input, select { border: 1px solid #707070; padding: 10px; border-radius: 3px; }
-        th { text-align: left; background-color: #f1f1f1; padding: 12px; font-size: 14px; text-transform: uppercase; color: #555; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 15px; }
+        input, select { border: 1px solid #707070; padding: 10px; border-radius: 3px; font-size: 15px; }
+        th { text-align: left; background-color: #f1f1f1; padding: 12px; font-size: 13px; text-transform: uppercase; color: #555; letter-spacing: 0.5px; border-bottom: 2px solid #ddd; }
+        td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
         .hidden { display: none; }
         .tara-method { border: 1px solid #ddd; padding: 20px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s; }
         .tara-method:hover { border-color: #004277; background: #f0f7ff; }
+        .time-box { line-height: 1.4; }
+        .time-label { font-size: 11px; color: #777; font-weight: bold; text-transform: uppercase; display: block; }
     </style>
 </head>
 <body>
 
     <!-- Ülariba -->
     <header class="veera-blue text-white p-4 shadow-md">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-6 cursor-pointer" onclick="showView('home')">
                 <div class="font-bold text-xl tracking-tight uppercase">Politsei- ja Piirivalveamet</div>
             </div>
             <div id="authButtons" class="flex space-x-4">
-                <button onclick="showView('tara')" class="bg-white text-blue-900 px-4 py-1 rounded text-sm font-bold hover:bg-gray-100">Logi sisse korraldajana</button>
-                <button onclick="showView('tara')" class="bg-blue-800 text-white px-4 py-1 rounded text-sm font-bold border border-blue-400">Logi sisse ametnikuna</button>
+                <button onclick="showView('tara')" class="bg-white text-blue-900 px-4 py-1 rounded text-sm font-bold hover:bg-gray-100 uppercase">Logi sisse korraldajana</button>
+                <button onclick="showView('tara')" class="bg-blue-800 text-white px-4 py-1 rounded text-sm font-bold border border-blue-400 uppercase">Logi sisse ametnikuna</button>
             </div>
             <div id="userProfile" class="hidden flex items-center space-x-4">
                 <span class="text-sm border-r pr-4 border-blue-400">JAAN TAMM</span>
@@ -42,19 +43,19 @@
     </header>
 
     <!-- VAADE 1: AVALIK TABEL -->
-    <main id="view-home" class="max-w-6xl mx-auto py-10 px-4">
+    <main id="view-home" class="max-w-7xl mx-auto py-10 px-4">
         <h1 class="text-3xl font-bold mb-8 veera-text">Politseis registreeritud avalikud koosolekud</h1>
         
         <!-- Otsingu sektsioon -->
-        <div class="card p-6 mb-8 bg-gray-50">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div class="card p-6 mb-8 bg-gray-50 border-t-4 border-t-blue-800">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                 <div>
-                    <label class="block text-sm font-bold mb-1">Algus alates</label>
-                    <input type="date" class="w-full" value="2024-05-20">
+                    <label class="block text-sm font-bold mb-1">Alates</label>
+                    <input type="text" class="w-full" placeholder="pp.kk.aaaa" value="23.05.2024">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-1">Kuni</label>
-                    <input type="date" class="w-full">
+                    <input type="text" class="w-full" placeholder="pp.kk.aaaa">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-1">Märksõna / Koht</label>
@@ -65,34 +66,68 @@
         </div>
 
         <!-- Tabel -->
-        <div class="card overflow-hidden">
+        <div class="card overflow-x-auto">
             <table class="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th width="20%">Aeg</th>
-                        <th width="25%">Koht / Marsruut</th>
-                        <th>Nimetus / Korraldaja</th>
+                        <th width="180">Aeg</th>
+                        <th width="35%">Koht / Marsruut</th>
+                        <th>Eesmärk / Korraldaja</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Näide 1: Kompleksne asukoht ja marsruut -->
                     <tr>
-                        <td class="font-bold">22.05.2024<br><span class="text-sm font-normal">12:00 - 14:00</span></td>
-                        <td>Tallinn, Vabaduse väljak</td>
-                        <td class="veera-text font-bold uppercase">Toetusmeeleavaldus haridustöötajatele<br><span class="text-gray-600 font-normal normal-case">MTÜ Hariduse Sõbrad</span></td>
+                        <td class="time-box">
+                            <span class="time-label">Algus:</span>
+                            <span class="font-bold">24.05.2024</span> 12:00<br>
+                            <span class="time-label mt-2">Lõpp:</span>
+                            <span class="font-bold">24.05.2024</span> 16:00
+                        </td>
+                        <td>
+                            <div class="mb-2"><strong>Koht:</strong> Harju maakond, Tallinn, Kesklinna linnaosa, Vabaduse väljak</div>
+                            <div class="text-gray-600 text-sm italic"><strong>Marsruut:</strong> Vabaduse väljak – Kaarli puiestee – Toompea tänav – Lossi plats – Pikk jalg – Pikk tänav – Kinga tänav – Raekoja plats – Kullassepa tänav - Harju tänav – Vabaduse väljak</div>
+                        </td>
+                        <td>
+                            <div class="veera-text font-bold uppercase mb-1">Traditsiooniline vanalinna ringkäik ja meeleavaldus</div>
+                            <div class="text-gray-700">MTÜ Tallinna Kultuuripärand</div>
+                        </td>
                     </tr>
+                    <!-- Näide 2: Mitmepäevane koosolek -->
                     <tr>
-                        <td class="font-bold">24.05.2024<br><span class="text-sm font-normal">10:00 - 18:00</span></td>
-                        <td>Tartu, Raekoja plats</td>
-                        <td class="veera-text font-bold uppercase">Kevadlaat ja kogukonna turg<br><span class="text-gray-600 font-normal normal-case">Tartu Linnavalitsus</span></td>
+                        <td class="time-box">
+                            <span class="time-label">Algus:</span>
+                            <span class="font-bold">26.05.2024</span> 09:00<br>
+                            <span class="time-label mt-2">Lõpp:</span>
+                            <span class="font-bold">28.05.2024</span> 21:00
+                        </td>
+                        <td>
+                            <strong>Koht:</strong> Tartu maakond, Tartu linn, Raekoja plats
+                        </td>
+                        <td>
+                            <div class="veera-text font-bold uppercase mb-1">Kevadine tudengifestival ja vabaõhukoosolekud</div>
+                            <div class="text-gray-700">Tartu Üliõpilaskond</div>
+                        </td>
                     </tr>
+                    <!-- Näide 3: Tavaline lühike koosolek -->
                     <tr>
-                        <td class="font-bold">25.05.2024<br><span class="text-sm font-normal">18:00 - 20:00</span></td>
-                        <td>Tallinn, Lossi plats 1a</td>
-                        <td class="veera-text font-bold uppercase">Pikett keskkonnahoiu toetuseks<br><span class="text-gray-600 font-normal normal-case">Erakond Eestimaa Rohelised</span></td>
+                        <td class="time-box">
+                            <span class="time-label">Algus:</span>
+                            <span class="font-bold">30.05.2024</span> 17:30<br>
+                            <span class="time-label mt-2">Lõpp:</span>
+                            <span class="font-bold">30.05.2024</span> 19:00
+                        </td>
+                        <td>
+                            <strong>Koht:</strong> Pärnu maakond, Pärnu linn, Iseseisvuse väljak
+                        </td>
+                        <td>
+                            <div class="veera-text font-bold uppercase mb-1">Pikett kohaliku raamatukogu toetuseks</div>
+                            <div class="text-gray-700">Eraisik Mari Mets</div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="p-4 bg-gray-50 text-center text-sm text-gray-500">
+            <div class="p-6 bg-gray-50 text-center text-sm text-gray-500 border-t">
                 Kuvatakse 1-3 registreeritud koosolekut 124-st
             </div>
         </div>
@@ -100,7 +135,7 @@
 
     <!-- VAADE 2: TARA AUTENTIMINE -->
     <main id="view-tara" class="hidden max-w-2xl mx-auto py-20 px-4">
-        <div class="card p-10 text-center">
+        <div class="card p-10 text-center border-t-4 border-t-blue-800">
             <img src="https://e-gov.github.io/TARA-Doku/img/tara-logo.png" alt="TARA" class="h-12 mx-auto mb-8">
             <h2 class="text-xl font-bold mb-6">Valige autentimisvahend</h2>
             
@@ -115,41 +150,42 @@
                     <div class="font-bold text-blue-700">Smart-ID</div>
                 </div>
             </div>
-            
-            <p class="text-xs text-gray-500">TARA on Riigi infosüsteemi ameti pakutav keskne autentimisteenus.</p>
-            <button onclick="showView('home')" class="mt-8 text-sm underline text-gray-500">Katkesta</button>
+            <button onclick="showView('home')" class="text-sm underline text-gray-500 uppercase font-bold tracking-wider">Tühista</button>
         </div>
     </main>
 
-    <!-- VAADE 3: TEATE ESITAMISE VORM (Sinu varem loodud kood) -->
+    <!-- VAADE 3: TEATE ESITAMISE VORM -->
     <main id="view-form" class="hidden max-w-4xl mx-auto py-10 px-4">
-        <div class="mb-6">
-            <button onclick="showView('home')" class="text-sm veera-text font-bold">← Tagasi avalikule lehele</button>
+        <div class="mb-6 flex justify-between items-center">
+            <button onclick="showView('home')" class="text-sm veera-text font-bold uppercase">← Tagasi avalikule lehele</button>
+            <span class="bg-gray-200 px-3 py-1 rounded text-xs font-bold uppercase">Uus teade</span>
         </div>
 
-        <div class="card p-8">
+        <div class="card p-8 border-t-4 border-t-blue-800">
             <h2 class="text-2xl font-bold mb-6 veera-text border-b pb-4">Avaliku koosoleku teatamine</h2>
-            <form id="noticeForm">
-                <!-- Sinu vormi sisu... -->
-                <div class="grid grid-cols-1 gap-6">
+            <form id="noticeForm" class="space-y-6">
+                <div>
+                    <label class="block font-bold mb-1">Koosoleku eesmärk</label>
+                    <textarea id="purpose" rows="3" class="w-full" placeholder="Kirjeldage lühidalt koosoleku sisu ja eesmärki" required></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label>Koosoleku eesmärk</label>
-                        <textarea id="purpose" rows="2" class="w-full" required></textarea>
+                        <label class="block font-bold mb-1">Alguse kuupäev ja kellaaeg</label>
+                        <input type="datetime-local" id="startDate" class="w-full" required>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label>Algus</label>
-                            <input type="datetime-local" class="w-full" required>
-                        </div>
-                        <div>
-                            <label>Koht</label>
-                            <input type="text" class="w-full" placeholder="Vabaduse väljak" required>
-                        </div>
+                    <div>
+                        <label class="block font-bold mb-1">Toimumise koht (või alguspunkt)</label>
+                        <input type="text" class="w-full" placeholder="Maakond, linn, aadress" required>
                     </div>
-                    <div class="bg-green-50 p-4 border border-green-200 text-sm">
-                        Teie isik on tuvastatud: <strong>JAAN TAMM (38001010000)</strong>. Andmed eeltäidetakse registrist.
-                    </div>
-                    <button type="submit" class="btn-veera py-3 text-lg">ESITA TEADE POLITSEILE</button>
+                </div>
+
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-800 text-sm">
+                    <strong>KORRALDAJA INFO:</strong> Teie isik on tuvastatud (JAAN TAMM, 38001010000). Kontaktandmed eeltäidetakse rahvastikuregistrist.
+                </div>
+
+                <div class="flex justify-end pt-4 border-t">
+                    <button type="submit" class="btn-veera px-12 py-3">ESITA TEADE</button>
                 </div>
             </form>
         </div>
@@ -157,28 +193,25 @@
 
     <!-- VAADE 4: EDUKAS SAATMINE -->
     <main id="view-success" class="hidden max-w-2xl mx-auto py-20 px-4 text-center">
-        <div class="card p-10">
-            <div class="text-green-600 text-5xl mb-4">✓</div>
-            <h2 class="text-2xl font-bold mb-4">Teade edukalt esitatud!</h2>
-            <p class="mb-8">Teie teade on registreeritud numbriga <strong>AVK-2024-001</strong>. Ametnik vaatab selle läbi 4 tööpäeva jooksul.</p>
+        <div class="card p-12 border-t-4 border-t-green-600">
+            <div class="text-green-600 text-6xl mb-6">✓</div>
+            <h2 class="text-2xl font-bold mb-4 uppercase">Teade edukalt esitatud!</h2>
+            <p class="mb-8 text-gray-600">Teie teade on registreeritud numbriga <strong>AVK-2024-088</strong>. Politsei vaatab teate läbi ja võtab teadmiseks või küsib täpsustusi 4 tööpäeva jooksul.</p>
             <button onclick="showView('home')" class="btn-veera">Tagasi avalehele</button>
         </div>
     </main>
 
     <script>
         function showView(viewName) {
-            // Peida kõik vaated
             document.querySelectorAll('main').forEach(view => view.classList.add('hidden'));
-            // Näita soovitud vaadet
             document.getElementById('view-' + viewName).classList.remove('hidden');
             window.scrollTo(0,0);
         }
 
         function loginSuccess() {
-            // Simuleeri sisselogimist
             document.getElementById('authButtons').classList.add('hidden');
             document.getElementById('userProfile').classList.remove('hidden');
-            showView('form'); // Suuna kohe vormile
+            showView('form');
         }
 
         function logout() {
@@ -191,6 +224,13 @@
             e.preventDefault();
             showView('success');
         }
+
+        // Seame vormile vaikimisi miinimumkuupäevaks +4 päeva täna
+        const today = new Date();
+        today.setDate(today.getDate() + 4);
+        const minDate = today.toISOString().split('T')[0] + "T12:00";
+        const dateInput = document.getElementById('startDate');
+        if(dateInput) dateInput.min = minDate;
     </script>
 </body>
 </html>
